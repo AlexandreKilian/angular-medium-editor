@@ -7,7 +7,7 @@ angular.module('angular-medium-editor', [])
     return {
       require: 'ngModel',
       restrict: 'AE',
-      scope: { bindOptions: '=' },
+      scope: { bindOptions: '=', editable: '=' },
       link: function(scope, iElement, iAttrs, ctrl) {
 
         angular.element(iElement).addClass('angular-medium-editor');
@@ -39,6 +39,14 @@ angular.module('angular-medium-editor', [])
             opts.placeholder = '';
           }
           ctrl.editor = new MediumEditor(iElement, opts);
+        });
+
+        scope.$watch('editable',function(active){
+          if(active){
+            ctrl.editor.activate();
+          } else {
+            ctrl.editor.deactivate();
+          }
         });
 
         var onChange = function() {
