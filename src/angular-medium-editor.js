@@ -31,7 +31,7 @@ angular.module('angular-medium-editor', [])
           // in case options are provided after mediumEditor directive has been compiled and linked (and after $render function executed)
           // we need to re-initialize
           if (ctrl.editor) {
-            ctrl.editor.deactivate();
+            ctrl.editor.destroy();
           }
           prepOpts();
           // Hide placeholder when the model is not empty
@@ -39,13 +39,20 @@ angular.module('angular-medium-editor', [])
             opts.placeholder = '';
           }
           ctrl.editor = new MediumEditor(iElement, opts);
+          if(iAttrs.events){
+            var evts = scope.$eval(iAttrs.events);
+            for(var i in evts){
+            var fn = evts[i];
+                ctrl.editor.subscribe(i,scope.$parent[fn]);
+            }
+          }
         });
 
         scope.$watch('editable',function(active){
           if(active){
-            ctrl.editor.activate();
+            ctrl.editor.setup();
           } else {
-            ctrl.editor.deactivate();
+            ctrl.editor.destroy();
           }
         });
 
@@ -58,6 +65,13 @@ angular.module('angular-medium-editor', [])
             if (iElement.html() === '<p><br></p>' || iElement.html() === '') {
               opts.placeholder = placeholder;
               var editor = new MediumEditor(iElement, opts);
+              if(iAttrs.events){
+                var evts = scope.$eval(iAttrs.events);
+                for(var i in evts){
+                var fn = evts[i];
+                    editor.subscribe(i,scope.$parent[fn]);
+                }
+              }
             }
 
             ctrl.$setViewValue(iElement.html());
@@ -78,6 +92,13 @@ angular.module('angular-medium-editor', [])
             }
 
             this.editor = new MediumEditor(iElement, opts);
+            if(iAttrs.events){
+              var evts = scope.$eval(iAttrs.events);
+              for(var i in evts){
+              var fn = evts[i];
+                  this.editor.subscribe(i,scope.$parent[fn]);
+              }
+            }
           }
 
           iElement.html(ctrl.$isEmpty(ctrl.$viewValue) ? '' : ctrl.$viewValue);
